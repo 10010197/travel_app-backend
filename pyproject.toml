@@ -1,0 +1,51 @@
+[project]
+name = "wayfarer-backend"
+version = "0.1.0"
+description = "Wayfarer API (FastAPI + Supabase). Phase 2 backend for the meal-planning SPA."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi==0.146.0",
+    "httpx==0.28.1",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "pyjwt[crypto]==2.15.1",
+    "supabase==2.33.0",
+    "uvicorn[standard]==0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy==2.4.0",
+    "pgserver==0.1.4",
+    "psycopg[binary]==3.3.6",
+    "pytest==9.1.1",
+    "ruff==0.17.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N"]
+# 코드 줄 길이는 ruff format이 맞춘다. 한글 주석은 폭이 2칸으로 계산돼 E501과 자주 부딪쳐서 끈다
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+mypy_path = "."
+packages = ["app"]
+
+[[tool.mypy.overrides]]
+module = ["supabase.*", "postgrest.*", "gotrue.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["db: needs a Postgres database (DATABASE_URL_TEST); skipped when it is not set"]

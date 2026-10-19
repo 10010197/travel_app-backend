@@ -1,0 +1,117 @@
+# Wayfarer 백엔드
+
+프론트엔드(`frontend/`)가 MSW 목으로 쓰던 API를 실제로 구현하는 FastAPI 서버. 데이터베이스와 인증은 Supabase.
+
+- 구조 기준: `docs/ARCHITECTURE.md` (4장 백엔드, 5장 목 → 백엔드 대응표)
+- 규칙 기준: `docs/BUSINESS_LOGIC.md` · API 계약: `frontend/CLAUDE.md` "API 계약" 표, `frontend/src/api/schemas`
+- 단계: `docs/IMPLEMENTATION_PLAN.md` Phase 2 (B1~B7)
+
+## 현재 상태
+
+| 단계 | 상태 | 내용 |
+|---|---|---|
+| B1 | ✅ | 프로젝트, `core/`(설정·오류·인증·호출 제한·로그), `db/`, 마이그레이션 + RLS, 마스터 데이터 시드, DB 테스트 |
+| B2 | — | `app/domain` 포팅 (`shared/rule-fixtures` 통과) |
+| B3 | — | identity·catalog·trips 모듈 |
+| B4 | — | places 모듈 + Places 프록시 |
+| B5 | — | AI 통합 (LangChain) |
+| B6 | — | sharing 모듈 |
+| B7 | — | 계약을 OpenAPI로 이전, 배포 |
+
+## 명령어
+
+`uv`로 관리한다. Python은 3.12 (`.python-version`). `uv`가 PATH에 없으면 `py -3.12 -m uv`로 부른다.
+
+```bash
+uv sync                                         # 의존성 설치 (.venv)
+uv run uvicorn app.main:app --reload --port 8000
+uv run pytest                                   # 전체 테스트 (DB 테스트 포함)
+uv run ruff format . && uv run ruff check .
+uv run mypy                                     # strict
+uv run python -m app.seed.master_data --sql     # shared/master-data → supabase/seed.sql 다시 만들기
+uv run python -m app.seed.master_data           # Supabase에 마스터 데이터 upsert (service_role 키 필요)
+```
+
+의존성을 더할 때는 `uv add --bounds exact <패키지>`로 정확한 버전을 고정한다 (프론트와 같은 규칙).
+
+## 구조
+
+```
+app/
+  main.py            create_app(). 모든 라우터를 /api 아래에 붙인다
+  core/              config, errors, security, rate_limit, logging
+  db/supabase.py     user_client(user) = RLS 적용 / admin_client() = RLS 우회
+  routers/           경계에 속하지 않는 라우터 (health)
+  modules/<경계>/    identity, catalog, trips, places, sharing (B3~)
+                     router.py → service.py → repository.py, schemas.py
+  domain/            프론트 src/domain과 1:1인 순수 함수 (B2~)
+  integrations/      ai/, places/ — ports.py(Protocol) + 실제 구현 + fake.py (B4~)
+  seed/master_data.py
+supabase/
+  migrations/        0001_catalog … 0006_rls (테이블은 0001~0005, RLS는 0006에 모았다)
+  seed.sql           자동 생성 파일. 직접 고치지 않는다
+tests/
+  core/  seed/       DB 없이 도는 테스트
+  db/                마이그레이션·RLS 테스트 (supabase_stub.sql로 Supabase 흉내)
+```
+
+## 규칙
+
+### 층
+
+- router: 요청 파싱, `CurrentUserDep`, 서비스 호출, 응답 모델. 규칙 판단·DB 접근·외부 호출 금지.
+- service: 비즈니스 규칙과 여러 테이블에 걸친 변경. 실패는 `AppError`로 던진다.
+- repository: 테이블 읽기·쓰기만.
+- domain: I/O 없는 결정론적 함수. 프론트 `src/domain`과 이름을 맞춘다(`evaluateDuplicates` → `evaluate_duplicates`).
+- 다른 모듈의 데이터는 그 모듈의 **service**로 받는다. 다른 모듈의 repository를 직접 부르지 않는다.
+- 프롬프트와 외부 API 호출은 `integrations/`에만 둔다(TECH_STACK 3장).
+
+### API 계약
+
+- 경로는 `frontend/src/api/endpoints.ts`와 같다. 앞에 `/api`가 붙는다.
+- JSON 필드는 camelCase. Pydantic 모델에 `alias_generator=to_camel`, `populate_by_name=True`를 쓴다.
+- 오류는 항상 `{ "error": { "code", "message" } }`. 코드는 `core/errors.py`의 `ErrorCode`만 쓴다(프론트 `ApiError.code`와 같은 문자열). 검증 실패는 422가 아니라 400 `VALIDATION_ERROR`.
+- 계약을 바꾸면 `frontend/src/api/schemas`와 `frontend/CLAUDE.md` 표를 같은 커밋에서 바꾼다(B7 전까지 프론트 zod가 원본).
+
+### 인증
+
+- 모든 보호된 엔드포인트는 `user: CurrentUserDep`를 받는다. 사용자 id는 토큰의 `sub`만 쓴다. 요청 본문의 사용자 id는 믿지 않는다.
+- 게스트 = 토큰의 `is_anonymous`. 로그인 전용 기능은 `require_registered(user)` (403 `LOGIN_REQUIRED`).
+- 토큰 검증: `SUPABASE_JWT_SECRET`이 있으면 HS256, 없으면 `SUPABASE_URL`의 JWKS(ES256/RS256). 대상 `authenticated`, 발급자 `<SUPABASE_URL>/auth/v1`.
+- `/auth/*`는 만들지 않는다. 프론트가 Supabase Auth를 직접 쓴다.
+
+### 데이터베이스
+
+- 스키마 변경은 새 마이그레이션 파일로만 한다. 이미 적용한 파일을 고치지 않는다(아직 원격에 적용하기 전인 B1 파일은 예외).
+- 모든 public 테이블에 RLS를 켠다. 사용자 데이터는 `auth.uid()`, 여행에 딸린 데이터는 `public.is_trip_owner(trip_id)`.
+- 정책 안에서 같은 테이블을 다시 조회하지 않는다. 무한 재귀 오류가 난다. `security definer` 도우미 함수로 우회한다(`has_any_trip`, `is_trip_owner`).
+- 외래 키 검사는 RLS를 거치지 않는다. 여행에 딸린 자식 행은 `(id, trip_id)` 복합 외래 키로 같은 여행 것만 가리키게 한다. 다른 사용자 소유 행을 가리킬 수 있는 열(`saved_place_id`, `source_saved_id`)은 정책의 `with check`에서 소유를 확인한다.
+- 게스트 제한(여행 1개, 일행 저장 불가)은 서비스가 먼저 막고(409·403, 화면용 메시지), RLS가 한 번 더 막는다.
+- `admin_client()`(service_role)는 시드와 sharing 공개 조회에서만 쓴다.
+- 식당은 `place_id`만 저장한다. 이름·영업시간은 저장하지 않는다(Places 약관, C-8).
+
+### 마스터 데이터
+
+- 원본은 `shared/master-data/*.json` 하나다. 바꾸면 `--sql`로 `supabase/seed.sql`을 다시 만든다(`tests/seed`가 확인한다).
+- 동네 id는 도시를 넘어 유일해야 한다(`areas.id`가 기본 키).
+
+### 테스트
+
+- `tests/db`는 빈 PostgreSQL에 `supabase_stub.sql` → 마이그레이션 → `seed.sql` → `supabase_grants.sql`을 적용하고, 역할(`anon`·`authenticated`)과 `request.jwt.claims`를 바꿔 RLS를 검증한다.
+- DB 서버: `DATABASE_URL_TEST`가 있으면 그것, 없으면 `pgserver`(개발 의존성)가 임시 PostgreSQL을 띄운다. Docker 없이 돈다.
+- 실패를 기대하는 RLS 테스트는 `with pytest.raises(...), as_user(...):` 순서로 쓴다.
+- 외부 API(LLM, Places)는 테스트에서 실제로 부르지 않는다. `integrations/*/fake.py`를 쓴다.
+- 목 핸들러 테스트(`frontend/src/mocks/__tests__/handlers.test.ts`)의 시나리오를 모듈 테스트의 체크리스트로 쓴다.
+
+### 로그
+
+- 일행 이름·못 먹는 음식 원문·의견 작성자·토큰은 로그에 남기지 않는다. `core/logging.py`의 `RedactingFilter`가 dict 인자에서 가린다. 새 민감 필드는 `SENSITIVE_KEYS`에 더한다.
+
+## 처음 연결할 때 (Supabase)
+
+1. Supabase CLI 설치 후 `supabase init` → `supabase/config.toml`이 생긴다(아직 없음).
+2. 로컬: `supabase start` → `supabase db reset` (migrations + seed.sql 적용). 원격: `supabase link` → `supabase db push`.
+3. `.env.example`을 `.env`로 복사해 URL·키를 채운다.
+4. 프론트를 실제 서버에 붙이려면 `frontend`에서 `pnpm dev:real`(전부) 또는 `.env.partial` + `implementedEndpoints`(일부).
+
+로컬 Supabase(`supabase start`)는 Docker가 필요하고, Windows의 Docker Desktop은 WSL 2가 필요하다. 이 PC에는 아직 WSL이 없다.
