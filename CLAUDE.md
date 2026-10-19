@@ -3,7 +3,8 @@
 프론트엔드(`frontend/`)가 MSW 목으로 쓰던 API를 실제로 구현하는 FastAPI 서버. 데이터베이스와 인증은 Supabase.
 
 - 구조 기준: `docs/ARCHITECTURE.md` (4장 백엔드, 5장 목 → 백엔드 대응표)
-- 규칙 기준: `docs/BUSINESS_LOGIC.md` · API 계약: `frontend/CLAUDE.md` "API 계약" 표, `frontend/src/api/schemas`
+- 규칙 기준: `docs/BUSINESS_LOGIC.md` · API 계약: `docs/API_SPEC.md`, `frontend/src/api/schemas`
+- DB 구조: `docs/DATABASE.md` (무엇을 왜 저장하는지, API별 인덱스)
 - 단계: `docs/IMPLEMENTATION_PLAN.md` Phase 2 (B1~B7)
 
 ## 현재 상태
@@ -48,7 +49,7 @@ app/
   integrations/      ai/, places/ — ports.py(Protocol) + 실제 구현 + fake.py (B4~)
   seed/master_data.py
 supabase/
-  migrations/        0001_catalog … 0006_rls (테이블은 0001~0005, RLS는 0006에 모았다)
+  migrations/        0001_catalog … 0007_query_support (테이블 0001~0005, RLS 0006, 인덱스·요약 뷰 0007)
   seed.sql           자동 생성 파일. 직접 고치지 않는다
 tests/
   core/  seed/       DB 없이 도는 테스트
@@ -85,6 +86,8 @@ tests/
 - 스키마 변경은 새 마이그레이션 파일로만 한다. 이미 적용한 파일을 고치지 않는다(아직 원격에 적용하기 전인 B1 파일은 예외).
 - 모든 public 테이블에 RLS를 켠다. 사용자 데이터는 `auth.uid()`, 여행에 딸린 데이터는 `public.is_trip_owner(trip_id)`.
 - 정책 안에서 같은 테이블을 다시 조회하지 않는다. 무한 재귀 오류가 난다. `security definer` 도우미 함수로 우회한다(`has_any_trip`, `is_trip_owner`).
+- 사용자 데이터를 가리키는 외래 키에는 그 열로 시작하는 인덱스를 둔다(`tests/db`가 자동 확인). 마스터 데이터를 가리키는 외래 키는 예외.
+- 계산할 수 있는 값(지표, 목록 숫자)은 저장하지 않는다. 여행 목록 숫자는 `trip_summaries` 뷰가 센다.
 - 외래 키 검사는 RLS를 거치지 않는다. 여행에 딸린 자식 행은 `(id, trip_id)` 복합 외래 키로 같은 여행 것만 가리키게 한다. 다른 사용자 소유 행을 가리킬 수 있는 열(`saved_place_id`, `source_saved_id`)은 정책의 `with check`에서 소유를 확인한다.
 - 게스트 제한(여행 1개, 일행 저장 불가)은 서비스가 먼저 막고(409·403, 화면용 메시지), RLS가 한 번 더 막는다.
 - `admin_client()`(service_role)는 시드와 sharing 공개 조회에서만 쓴다.

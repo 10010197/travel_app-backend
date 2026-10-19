@@ -258,3 +258,71 @@ def test_filled_slot_needs_menu_and_deleting_saved_place_drops_must_pick(
         )
         db.execute("delete from public.saved_places where id = %s", (place[0],))
         assert db.execute("select count(*) from public.must_picks").fetchone() == (0,)
+
+
+# ---------- 조회 구조 (0007) ----------
+
+# 마스터 데이터는 거의 지우지 않으므로, 그쪽을 가리키는 외래 키에는 인덱스를 두지 않는다 (쓰기 비용만 늘어난다)
+CATALOG_TABLES = {"cities", "areas", "must_menus", "menu_kinds", "food_tags", "food_tag_presets"}
+
+
+def test_every_foreign_key_to_user_data_has_a_supporting_index(db: psycopg.Connection) -> None:
+    """부모 행을 지울 때 자식 행을 표 전체를 훑지 않고 찾도록, 외래 키의 첫 열로 시작하는 인덱스가 있어야 한다."""
+    rows = db.execute(
+        """
+        select con.conrelid::regclass::text as child,
+               con.confrelid::regclass::text as parent,
+               (select attname from pg_attribute
+                 where attrelid = con.conrelid and attnum = con.conkey[1]) as first_column
+        from pg_constraint con
+        join pg_namespace n on n.oid = con.connamespace
+        where con.contype = 'f' and n.nspname = 'public'
+        """
+    ).fetchall()
+    missing = []
+    for child, parent, first_column in rows:
+        if parent.replace("public.", "") in CATALOG_TABLES:
+            continue
+        has_index = db.execute(
+            """
+            select exists (
+              select 1 from pg_index i
+              join pg_attribute a on a.attrelid = i.indrelid and a.attnum = i.indkey[0]
+              where i.indrelid = %s::regclass and a.attname = %s
+            )
+            """,
+            (child, first_column),
+        ).fetchone()
+        if not (has_index and has_index[0]):
+            missing.append(f"{child}.{first_column} -> {parent}")
+    assert missing == []
+
+
+def test_trip_summaries_counts_slots_and_only_shows_own_trips(db: psycopg.Connection) -> None:
+    alice, bob = create_user(db), create_user(db)
+    with as_user(db, alice):
+        trip = insert_trip(db)
+        day, slot = insert_day_and_slot(db, trip)
+        for name, state, menu in [
+            ("저녁", "filled", "라멘"),
+            ("간식", "onsite", None),
+            ("야식", "skipped", None),
+        ]:
+            db.execute(
+                "insert into public.slots (trip_id, day_id, name, time_band, sort_order, state, menu) "
+                "values (%s, %s, %s, 'dinner', 1, %s, %s)",
+                (trip, day, name, state, menu),
+            )
+        db.execute(
+            "insert into public.trip_companions (trip_id, name, foods_raw, strictness) "
+            "values (%s, '민지', '비건', 'flex')",
+            (trip,),
+        )
+        summary = db.execute(
+            "select city_name, time_zone, companion_count, active_slots, filled_slots, "
+            "onsite_slots, empty_slots from public.trip_summaries"
+        ).fetchall()
+    # 끼니 4개: 비어 있음(점심) · 채움(저녁) · 현장에서(간식) · 빠짐(야식, 활성에서 제외)
+    assert summary == [("후쿠오카", "Asia/Tokyo", 1, 3, 1, 1, 1)]
+    with as_user(db, bob):
+        assert db.execute("select * from public.trip_summaries").fetchall() == []
