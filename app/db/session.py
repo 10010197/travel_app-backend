@@ -42,6 +42,9 @@ def _get_pool() -> ConnectionPool[Conn]:
             kwargs={"row_factory": dict_row},
             min_size=1,
             max_size=settings.db_pool_max_size,
+            # 꺼낼 때마다 연결이 살아 있는지 확인한다. DB가 재시작되거나 네트워크가 끊긴 뒤
+            # 죽은 연결로 요청이 500이 나지 않게 한다(죽었으면 새 연결로 바꿔 준다)
+            check=ConnectionPool.check_connection,
             open=True,
         )
     return _pool

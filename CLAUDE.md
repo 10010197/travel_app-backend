@@ -31,6 +31,7 @@ uv run ruff format . && uv run ruff check .
 uv run mypy                                     # strict
 uv run python -m app.seed.master_data --sql     # migrations → DB/init.sql, data/master-data → DB/data.sql 다시 만들기
 uv run python -m app.seed.master_data           # Supabase에 마스터 데이터 upsert (service_role 키 필요)
+uv run python -m app.seed.demo_user             # 로컬 Supabase에 개발용 데모 계정 (demo@wayfarer.test)
 ```
 
 의존성을 더할 때는 `uv add --bounds exact <패키지>`로 정확한 버전을 고정한다 (프론트와 같은 규칙).
@@ -133,4 +134,6 @@ npx -y supabase@2.121.0 stop           # 멈추기 (데이터는 남는다)
 - `DATABASE_URL_TEST`는 로컬 Supabase DB를 가리키지 않는다. `tests/db`는 빈 DB에 스텁부터 적용한다.
 - analytics를 켜면 Windows에서 `vector` 컨테이너가 Docker 소켓에 붙지 못해 계속 재시작한다.
 - 원격: `supabase link` → `supabase db push`.
-- 프론트를 실제 서버에 붙이려면 `frontend`에서 `pnpm dev:real`(전부) 또는 `.env.partial` + `implementedEndpoints`(일부).
+- `config.toml`의 인증: 익명 로그인 켬(게스트), `enable_manual_linking = true`(게스트 → 소셜 계정 연결), Google·카카오는 `enabled = false` 자리만 있다. OAuth 앱을 등록하면 `.env`에 `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`·`…_SECRET`(카카오도 같은 꼴)을 넣고 켠다.
+- 개발용 데모 계정: `uv run python -m app.seed.demo_user`. 비밀번호는 `.env`의 `DEMO_USER_PASSWORD`(없으면 만들어 적는다). 프론트 개발 서버의 "데모 계정으로 로그인"이 쓴다.
+- 프론트 연결: 이 서버(8000)를 켜고 `frontend`에서 `pnpm dev`. 프론트 `.env.development.local`에 Supabase URL·anon key·데모 비밀번호를 넣는다(프론트 `.env.example`).
