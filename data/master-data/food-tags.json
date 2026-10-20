@@ -1,0 +1,29 @@
+{
+  "$comment": "식이 제한 정규화 태그 (FEATURE_SPEC F-02, F-08). 일행의 못 먹는 음식 원문은 이 태그로 바뀌고, 필수 메뉴의 foodTags와 겹치면 R-03을 적용한다. 상위 태그(육류, 해산물)는 하위 태그를 가진 메뉴에 함께 붙인다.",
+  "status": "draft",
+  "tags": [
+    { "id": "meat", "label": "육류", "children": ["pork", "beef", "chicken", "offal"] },
+    { "id": "pork", "label": "돼지고기" },
+    { "id": "beef", "label": "소고기" },
+    { "id": "chicken", "label": "닭고기" },
+    { "id": "offal", "label": "내장" },
+    { "id": "seafood", "label": "해산물", "children": ["fish", "raw_fish", "crustacean", "shellfish", "cephalopod", "fish_roe"] },
+    { "id": "fish", "label": "생선" },
+    { "id": "raw_fish", "label": "날생선" },
+    { "id": "crustacean", "label": "갑각류" },
+    { "id": "shellfish", "label": "조개류" },
+    { "id": "cephalopod", "label": "오징어·문어" },
+    { "id": "fish_roe", "label": "생선알" },
+    { "id": "egg", "label": "달걀" },
+    { "id": "dairy", "label": "유제품" },
+    { "id": "wheat", "label": "밀" },
+    { "id": "nuts", "label": "견과류" },
+    { "id": "sesame", "label": "참깨" },
+    { "id": "alcohol", "label": "알코올" }
+  ],
+  "presets": [
+    { "label": "비건", "tags": ["meat", "seafood", "egg", "dairy"] },
+    { "label": "갑각류 알레르기", "tags": ["crustacean"] },
+    { "label": "날생선 못 먹음", "tags": ["raw_fish"] }
+  ]
+}

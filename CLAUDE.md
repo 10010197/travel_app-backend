@@ -12,7 +12,7 @@
 | 단계 | 상태 | 내용 |
 |---|---|---|
 | B1 | ✅ | 프로젝트, `core/`(설정·오류·인증·호출 제한·로그), `db/`, 마이그레이션 + RLS, 마스터 데이터 시드, DB 테스트 |
-| B2 | — | `app/domain` 포팅 (`shared/rule-fixtures` 통과) |
+| B2 | — | `app/domain` 포팅 (프론트 레포 `src/domain/__tests__/rule-fixtures` 복사해 통과) |
 | B3 | — | identity·catalog·trips 모듈 |
 | B4 | — | places 모듈 + Places 프록시 |
 | B5 | — | AI 통합 (LangChain) |
@@ -29,7 +29,7 @@ uv run uvicorn app.main:app --reload --port 8000
 uv run pytest                                   # 전체 테스트 (DB 테스트 포함)
 uv run ruff format . && uv run ruff check .
 uv run mypy                                     # strict
-uv run python -m app.seed.master_data --sql     # shared/master-data → supabase/seed.sql 다시 만들기
+uv run python -m app.seed.master_data --sql     # data/master-data → supabase/seed.sql 다시 만들기
 uv run python -m app.seed.master_data           # Supabase에 마스터 데이터 upsert (service_role 키 필요)
 ```
 
@@ -95,7 +95,7 @@ tests/
 
 ### 마스터 데이터
 
-- 원본은 `shared/master-data/*.json` 하나다. 바꾸면 `--sql`로 `supabase/seed.sql`을 다시 만든다(`tests/seed`가 확인한다).
+- 원본은 `data/master-data/*.json` 하나다. 프론트 레포의 `src/mocks/data/master-data`는 복사본이라, 바꾸면 그쪽에도 복사한다. 바꾸면 `--sql`로 `supabase/seed.sql`을 다시 만든다(`tests/seed`가 확인한다).
 - 동네 id는 도시를 넘어 유일해야 한다(`areas.id`가 기본 키).
 
 ### 테스트

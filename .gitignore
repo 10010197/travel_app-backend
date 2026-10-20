@@ -4,3 +4,12 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .env
+.env.local
+*.local
+
+# OS·에디터
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp

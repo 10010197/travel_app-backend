@@ -1,5 +1,5 @@
 -- 자동 생성 파일: backend/app/seed/master_data.py --sql
--- 원본은 shared/master-data/*.json. 이 파일을 직접 고치지 않는다.
+-- 원본은 backend/data/master-data/*.json. 이 파일을 직접 고치지 않는다.
 
 insert into public.menu_kinds (id, label, allow_daily_repeat, sort_order) values
   ('noodle', '면', false, 0),

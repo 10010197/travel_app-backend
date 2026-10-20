@@ -1,4 +1,4 @@
--- 마스터 데이터 (catalog 경계). 원본은 shared/master-data/*.json, app/seed/master_data.py가 채운다.
+-- 마스터 데이터 (catalog 경계). 원본은 data/master-data/*.json, app/seed/master_data.py가 채운다.
 -- 사용자는 읽기만 한다(0006 RLS). 쓰기는 service_role(시드)만.
 
 create table public.menu_kinds (

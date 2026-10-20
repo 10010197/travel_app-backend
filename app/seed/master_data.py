@@ -1,6 +1,6 @@
 """마스터 데이터 시드 (catalog 경계, docs/ARCHITECTURE.md 6장).
 
-원본은 저장소 루트의 shared/master-data/*.json 하나다. 프론트 목(frontend/src/mocks/reference.ts)도 같은 파일을 읽는다.
+원본은 backend/data/master-data/*.json 하나다. 프론트 레포의 목(src/mocks/data/master-data)은 이 파일의 복사본이다.
 이 모듈은 JSON을 catalog 테이블 행으로 바꾸고, 두 가지 방법으로 넣는다.
 
 - `uv run python -m app.seed.master_data`        Supabase에 upsert (service_role 키 필요)
@@ -15,9 +15,9 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-MASTER_DIR = REPO_ROOT / "shared" / "master-data"
-SEED_SQL_PATH = REPO_ROOT / "backend" / "supabase" / "seed.sql"
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+MASTER_DIR = BACKEND_ROOT / "data" / "master-data"
+SEED_SQL_PATH = BACKEND_ROOT / "supabase" / "seed.sql"
 
 Row = dict[str, Any]
 
@@ -37,7 +37,7 @@ def _read(path: Path) -> Any:
 
 
 def build_catalog_rows(master_dir: Path = MASTER_DIR) -> dict[str, list[Row]]:
-    """shared/master-data의 JSON을 테이블별 행 목록으로 바꾼다. 순서(sort_order)는 JSON 순서를 따른다."""
+    """data/master-data의 JSON을 테이블별 행 목록으로 바꾼다. 순서(sort_order)는 JSON 순서를 따른다."""
     kinds = _read(master_dir / "menu-kinds.json")["kinds"]
     tags_doc = _read(master_dir / "food-tags.json")
 
@@ -154,7 +154,7 @@ def render_seed_sql(rows: dict[str, list[Row]]) -> str:
     """supabase/seed.sql 내용. 직접 고치지 말고 이 함수로 다시 만든다."""
     header = (
         "-- 자동 생성 파일: backend/app/seed/master_data.py --sql\n"
-        "-- 원본은 shared/master-data/*.json. 이 파일을 직접 고치지 않는다.\n\n"
+        "-- 원본은 backend/data/master-data/*.json. 이 파일을 직접 고치지 않는다.\n\n"
     )
     return header + "\n".join(_upsert_sql(t, key, rows[t]) for t, key in TABLE_ORDER)
 
@@ -172,7 +172,7 @@ def upsert_to_supabase(rows: dict[str, list[Row]]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="shared/master-data → catalog 테이블")
+    parser = argparse.ArgumentParser(description="data/master-data → catalog 테이블")
     parser.add_argument("--sql", action="store_true", help="supabase/seed.sql을 다시 만든다")
     args = parser.parse_args()
 

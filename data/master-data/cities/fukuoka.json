@@ -1,0 +1,100 @@
+{
+  "$comment": "시연 도시 후쿠오카 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
+  "status": "draft",
+  "id": "fukuoka",
+  "name": "후쿠오카",
+  "countryCode": "JP",
+  "timeZone": "Asia/Tokyo",
+  "center": { "lat": 33.5902, "lng": 130.4017 },
+  "areas": [
+    { "id": "hakata", "name": "하카타", "center": { "lat": 33.5902, "lng": 130.4207 }, "radiusMeters": 800 },
+    { "id": "tenjin", "name": "텐진", "center": { "lat": 33.5911, "lng": 130.399 }, "radiusMeters": 700 },
+    { "id": "nakasu", "name": "나카스", "center": { "lat": 33.5935, "lng": 130.4062 }, "radiusMeters": 500 },
+    { "id": "yakuin", "name": "야쿠인", "center": { "lat": 33.5822, "lng": 130.3986 }, "radiusMeters": 600 },
+    { "id": "ohori", "name": "오호리 공원", "center": { "lat": 33.5858, "lng": 130.3762 }, "radiusMeters": 700 },
+    { "id": "momochi", "name": "모모치", "center": { "lat": 33.5934, "lng": 130.3515 }, "radiusMeters": 1000 },
+    { "id": "dazaifu", "name": "다자이후", "center": { "lat": 33.5196, "lng": 130.5347 }, "radiusMeters": 1000 }
+  ],
+  "mustMenus": [
+    {
+      "id": "fuk-motsunabe",
+      "name": "모츠나베",
+      "kindId": "hotpot",
+      "description": "곱창 전골, 후쿠오카 대표 메뉴",
+      "foodTags": ["meat", "beef", "offal"],
+      "isSignature": true
+    },
+    {
+      "id": "fuk-mentaiko-onigiri",
+      "name": "멘타이코 주먹밥",
+      "kindId": "rice",
+      "description": "명란젓, 하카타 명물",
+      "foodTags": ["seafood", "fish_roe"],
+      "isSignature": true
+    },
+    {
+      "id": "fuk-mizutaki",
+      "name": "미즈타키",
+      "kindId": "hotpot",
+      "description": "맑은 닭 육수 전골",
+      "foodTags": ["meat", "chicken"],
+      "isSignature": true
+    },
+    {
+      "id": "fuk-yatai",
+      "name": "야타이",
+      "kindId": "street",
+      "description": "나카스 강변 포장마차, 저녁 추천",
+      "foodTags": [],
+      "isSignature": true
+    },
+    {
+      "id": "fuk-hakata-ramen",
+      "name": "하카타 라멘",
+      "kindId": "noodle",
+      "description": "돼지뼈 국물의 가는 면",
+      "foodTags": ["meat", "pork", "wheat"],
+      "isSignature": false
+    },
+    {
+      "id": "fuk-gomasaba",
+      "name": "고마사바",
+      "kindId": "seafood",
+      "description": "참깨 소스 고등어회",
+      "foodTags": ["seafood", "fish", "raw_fish", "sesame"],
+      "isSignature": false
+    },
+    {
+      "id": "fuk-crab",
+      "name": "게 요리",
+      "kindId": "seafood",
+      "description": "제철 게 정식",
+      "foodTags": ["seafood", "crustacean"],
+      "isSignature": false
+    },
+    {
+      "id": "fuk-udon",
+      "name": "하카타 우동",
+      "kindId": "noodle",
+      "description": "부드러운 면과 우엉 튀김 고명",
+      "foodTags": ["wheat"],
+      "isSignature": false
+    },
+    {
+      "id": "fuk-ika",
+      "name": "이카 이키즈쿠리",
+      "kindId": "seafood",
+      "description": "살아 있는 오징어 회, 요부코 명물",
+      "foodTags": ["seafood", "cephalopod", "raw_fish"],
+      "isSignature": false
+    },
+    {
+      "id": "fuk-tetsunabe-gyoza",
+      "name": "테츠나베 교자",
+      "kindId": "grill",
+      "description": "철판에 구운 한입 교자",
+      "foodTags": ["meat", "pork", "wheat"],
+      "isSignature": false
+    }
+  ]
+}

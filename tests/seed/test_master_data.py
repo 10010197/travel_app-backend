@@ -29,7 +29,7 @@ def test_parent_food_tags_come_before_children() -> None:
 
 
 def test_committed_seed_sql_is_up_to_date() -> None:
-    """shared/master-data를 바꾸고 seed.sql을 다시 만들지 않으면 실패한다.
+    """data/master-data를 바꾸고 seed.sql을 다시 만들지 않으면 실패한다.
 
     고치려면: `uv run python -m app.seed.master_data --sql`
     """

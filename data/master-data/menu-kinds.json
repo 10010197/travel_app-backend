@@ -1,0 +1,17 @@
+{
+  "$comment": "메뉴 종류 목록 (FEATURE_SPEC F-04, Q-02). allowDailyRepeat=false인 종류는 하루에 2번 이상이면 중복 경고(R-01). status가 draft인 동안 면=false, 밥=true만 확정이고 나머지는 초안이다.",
+  "status": "draft",
+  "kinds": [
+    { "id": "noodle", "label": "면", "allowDailyRepeat": false },
+    { "id": "rice", "label": "밥", "allowDailyRepeat": true },
+    { "id": "hotpot", "label": "전골", "allowDailyRepeat": false },
+    { "id": "seafood", "label": "생선", "allowDailyRepeat": false },
+    { "id": "grill", "label": "고기", "allowDailyRepeat": false },
+    { "id": "fried", "label": "튀김", "allowDailyRepeat": false },
+    { "id": "street", "label": "포장마차", "allowDailyRepeat": false },
+    { "id": "bread", "label": "빵", "allowDailyRepeat": true },
+    { "id": "dessert", "label": "디저트", "allowDailyRepeat": true },
+    { "id": "cafe", "label": "카페", "allowDailyRepeat": true },
+    { "id": "other", "label": "기타", "allowDailyRepeat": true }
+  ]
+}
