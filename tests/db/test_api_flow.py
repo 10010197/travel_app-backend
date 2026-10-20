@@ -217,3 +217,20 @@ def test_collection_save_is_upsert_and_shows_placements(api: TestClient, databas
     )
     assert r.status_code == 200
     assert r.json()["placements"][0]["slotId"] == slot["id"]
+
+
+def test_anywhere_search_has_no_city_limit_or_distance(api: TestClient, database_url: str) -> None:
+    """다른 지역 검색: 여행 도시 밖 식당도 끼니에 넣을 수 있게 도시 제한·거리 없이 찾는다"""
+    user = new_user(database_url)
+    r = api.get(
+        "/api/search/places/anywhere", headers=user, params={"q": "라멘", "cityId": "fukuoka"}
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["scope"] == {"kind": "anywhere"}
+    assert body["query"] == "라멘"
+    assert body["results"] and all(p["distanceMeters"] is None for p in body["results"])
+    assert body["fallbackMapsUrl"].endswith("query=%EB%9D%BC%EB%A9%98")
+
+    r = api.get("/api/search/places/anywhere", headers=user, params={"q": "  "})
+    assert r.status_code == 400 and code(r) == "VALIDATION_ERROR"

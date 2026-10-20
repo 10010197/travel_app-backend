@@ -20,7 +20,7 @@ class SamplePlacesProvider:
         return [(PlaceDetail.model_validate(p), tuple(p["keywords"])) for p in raw]
 
     def text_search(
-        self, query: str, *, center: tuple[float, float], ignore: tuple[str, ...]
+        self, query: str, *, center: tuple[float, float] | None, ignore: tuple[str, ...]
     ) -> list[PlaceDetail]:
         tokens = [t for t in query.split() if t and t not in ignore]
         return [place for place, keywords in self._places if _matches(place, keywords, tokens)]

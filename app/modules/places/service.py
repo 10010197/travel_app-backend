@@ -29,6 +29,7 @@ from app.modules.catalog.schemas import Area, City
 from app.modules.catalog.service import classify_menu, get_catalog, require_supported_city
 from app.modules.places import repository
 from app.modules.places.schemas import (
+    AnywhereScope,
     AreaScope,
     CityScope,
     PlaceDetail,
@@ -178,6 +179,40 @@ def search_city(user: CurrentUser, city_id: str, q: str | None) -> PlaceSearchRe
             r.model_copy(update={"distance_meters": None}) for r in _search(city, keyword, None)
         ],
         fallback_maps_url=build_google_maps_search_url(full_query),
+    )
+
+
+# 다른 지역 검색의 검색어 길이 (메뉴 40자 + 지역 이름)
+ANYWHERE_QUERY_MAX = 80
+
+
+def search_anywhere(user: CurrentUser, q: str, city_id: str | None) -> PlaceSearchResponse:
+    """다른 지역 검색: 여행 도시 밖 식당도 끼니에 넣을 수 있게 도시 제한 없이 찾는다.
+
+    여행은 도시 하나로 두고(타이베이 여행에 타이중 식당 하나 넣기 같은 경우), 검색어에 지역을 직접 적는다
+    ("타이중 우육면"). city_id가 지원 도시면 결과를 그 도시 쪽으로만 기울인다. 거리는 없고 순서는 제공자 순서다.
+    """
+    query = q.strip()
+    if not 1 <= len(query) <= ANYWHERE_QUERY_MAX:
+        raise AppError(
+            400, ErrorCode.VALIDATION_ERROR, f"검색어를 1~{ANYWHERE_QUERY_MAX}자로 적어 주세요."
+        )
+    _limiter().hit(f"search:{user.id}")
+    city = get_catalog().city(city_id) if city_id else None
+    center = (city.center.lat, city.center.lng) if city else None
+    results: list[PlaceSearchResult] = []
+    try:
+        found = get_places_provider().text_search(query, center=center, ignore=())
+        results = [
+            PlaceSearchResult(**p.summary().model_dump(), distance_meters=None) for p in found
+        ]
+    except Exception:  # 실패해도 빈 결과 + 지도 링크로 흐름을 잇는다 (F-09 5)
+        logger.exception("다른 지역 식당 검색 실패")
+    return PlaceSearchResponse(
+        scope=AnywhereScope(),
+        query=query,
+        results=results,
+        fallback_maps_url=build_google_maps_search_url(query),
     )
 
 

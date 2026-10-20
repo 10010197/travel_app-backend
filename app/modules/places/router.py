@@ -28,6 +28,15 @@ def search_city_places(
     return service.search_city(user, city_id, q)
 
 
+@router.get("/search/places/anywhere", response_model=PlaceSearchResponse)
+def search_anywhere_places(
+    user: CurrentUserDep,
+    q: str = "",
+    city_id: str | None = Query(default=None, alias="cityId"),
+) -> PlaceSearchResponse:
+    return service.search_anywhere(user, q, city_id)
+
+
 @router.get("/places", response_model=list[PlaceDetail])
 def get_places(_user: CurrentUserDep, ids: str = "") -> list[PlaceDetail]:
     return service.get_places(ids)

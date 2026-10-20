@@ -69,24 +69,24 @@ class GooglePlacesProvider:
         )
 
     def text_search(
-        self, query: str, *, center: tuple[float, float], ignore: tuple[str, ...]
+        self, query: str, *, center: tuple[float, float] | None, ignore: tuple[str, ...]
     ) -> list[PlaceDetail]:
         # ignore(도시·동네 이름)는 Google이 위치 단서로 잘 쓰므로 검색어에서 빼지 않는다
-        lat, lng = center
+        body: dict[str, Any] = {
+            "textQuery": query,
+            "languageCode": LANGUAGE_CODE,
+            "pageSize": SEARCH_PAGE_SIZE,
+        }
+        if center is not None:
+            lat, lng = center
+            body["locationBias"] = {
+                "circle": {
+                    "center": {"latitude": lat, "longitude": lng},
+                    "radius": SEARCH_BIAS_RADIUS_METERS,
+                }
+            }
         response = self._client.post(
-            "/v1/places:searchText",
-            headers={"X-Goog-FieldMask": SEARCH_FIELD_MASK},
-            json={
-                "textQuery": query,
-                "languageCode": LANGUAGE_CODE,
-                "pageSize": SEARCH_PAGE_SIZE,
-                "locationBias": {
-                    "circle": {
-                        "center": {"latitude": lat, "longitude": lng},
-                        "radius": SEARCH_BIAS_RADIUS_METERS,
-                    }
-                },
-            },
+            "/v1/places:searchText", headers={"X-Goog-FieldMask": SEARCH_FIELD_MASK}, json=body
         )
         response.raise_for_status()
         places: list[dict[str, Any]] = response.json().get("places", [])

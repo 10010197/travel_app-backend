@@ -6,6 +6,7 @@ from app.core.schemas import ApiModel, Id, Instant, Menu40
 from app.integrations.places.models import PlaceDetail, PlaceSummary
 
 __all__ = [
+    "AnywhereScope",
     "AreaScope",
     "CityScope",
     "PlaceDetail",
@@ -33,8 +34,14 @@ class CityScope(ApiModel):
     kind: Literal["city"] = "city"
 
 
+class AnywhereScope(ApiModel):
+    """여행 도시 밖까지 (다른 지역 식당을 끼니에 넣을 때). 거리는 없다"""
+
+    kind: Literal["anywhere"] = "anywhere"
+
+
 class PlaceSearchResponse(ApiModel):
-    scope: AreaScope | CityScope
+    scope: AreaScope | CityScope | AnywhereScope
     query: str
     results: list[PlaceSearchResult]
     fallback_maps_url: str

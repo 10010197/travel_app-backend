@@ -11,9 +11,9 @@ from app.integrations.places.models import PlaceDetail
 
 class PlacesProvider(Protocol):
     def text_search(
-        self, query: str, *, center: tuple[float, float], ignore: tuple[str, ...]
+        self, query: str, *, center: tuple[float, float] | None, ignore: tuple[str, ...]
     ) -> list[PlaceDetail]:
-        """검색어에 맞는 식당 (center 근처 우선). ignore는 검색어 중 매칭에서 빼도 되는 도시·동네 이름"""
+        """검색어에 맞는 식당 (center가 있으면 그 근처 우선). ignore는 검색어 중 매칭에서 빼도 되는 도시·동네 이름"""
         ...
 
     def get(self, place_id: str) -> PlaceDetail | None:

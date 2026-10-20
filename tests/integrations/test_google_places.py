@@ -202,3 +202,14 @@ def test_provider_selection(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("GOOGLE_PLACES_API_KEY", API_KEY)
     get_settings.cache_clear()
     assert isinstance(get_places_provider(), GooglePlacesProvider)
+
+
+def test_text_search_without_center_sends_no_location_bias() -> None:
+    """다른 지역 검색(여행 도시 밖)은 위치로 기울이지 않고 검색어만 보낸다"""
+    google, seen = provider(lambda _: httpx.Response(200, json={"places": [RAMEN]}))
+
+    google.text_search("타이중 우육면", center=None, ignore=())
+
+    body = json.loads(seen[0].content)
+    assert body["textQuery"] == "타이중 우육면"
+    assert "locationBias" not in body
