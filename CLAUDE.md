@@ -110,11 +110,20 @@ tests/
 
 - 일행 이름·못 먹는 음식 원문·의견 작성자·토큰은 로그에 남기지 않는다. `core/logging.py`의 `RedactingFilter`가 dict 인자에서 가린다. 새 민감 필드는 `SENSITIVE_KEYS`에 더한다.
 
-## 처음 연결할 때 (Supabase)
+## 로컬 Supabase (Docker)
 
-1. Supabase CLI 설치 후 `supabase init` → `supabase/config.toml`이 생긴다(아직 없음).
-2. 로컬: `supabase start` → `supabase db reset` (migrations + seed.sql 적용). 원격: `supabase link` → `supabase db push`.
-3. `.env.example`을 `.env`로 복사해 URL·키를 채운다.
-4. 프론트를 실제 서버에 붙이려면 `frontend`에서 `pnpm dev:real`(전부) 또는 `.env.partial` + `implementedEndpoints`(일부).
+Docker Desktop(WSL 2 엔진)을 켜 두고, Supabase CLI는 설치하지 않고 `npx`로 버전을 고정해 부른다. `supabase/config.toml`은 커밋돼 있다(`project_id = "wayfarer"`, 익명 로그인 켬, analytics 끔).
 
-로컬 Supabase(`supabase start`)는 Docker가 필요하고, Windows의 Docker Desktop은 WSL 2가 필요하다. 이 PC에는 아직 WSL이 없다.
+```bash
+npx -y supabase@2.121.0 start          # 컨테이너 시작. 처음이면 migrations + seed.sql 적용
+npx -y supabase@2.121.0 status -o env  # URL·키 확인 → .env
+npx -y supabase@2.121.0 db reset       # DB를 migrations + seed.sql로 다시 만들기
+npx -y supabase@2.121.0 stop           # 멈추기 (데이터는 남는다)
+```
+
+- 주소: API `http://127.0.0.1:54321`, DB `postgresql://postgres:postgres@127.0.0.1:54322/postgres`, Studio `http://127.0.0.1:54323`
+- `.env`는 `.env.example`을 복사해 `SUPABASE_URL`·`SUPABASE_ANON_KEY`·`SUPABASE_SERVICE_ROLE_KEY`를 채운다. 로컬 Auth는 ES256으로 서명하므로 `SUPABASE_JWT_SECRET`은 **비워** JWKS로 검증한다(채우면 모든 토큰이 401).
+- `DATABASE_URL_TEST`는 로컬 Supabase DB를 가리키지 않는다. `tests/db`는 빈 DB에 스텁부터 적용한다.
+- analytics를 켜면 Windows에서 `vector` 컨테이너가 Docker 소켓에 붙지 못해 계속 재시작한다.
+- 원격: `supabase link` → `supabase db push`.
+- 프론트를 실제 서버에 붙이려면 `frontend`에서 `pnpm dev:real`(전부) 또는 `.env.partial` + `implementedEndpoints`(일부).
