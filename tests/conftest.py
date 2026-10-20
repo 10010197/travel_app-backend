@@ -23,6 +23,8 @@ def test_settings(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("SUPABASE_URL", TEST_SUPABASE_URL)
     monkeypatch.setenv("SUPABASE_JWT_SECRET", TEST_SECRET)
     monkeypatch.setenv("CORS_ORIGINS", "")
+    # .env에 실제 키가 있어도 테스트는 Google을 부르지 않는다 (샘플 제공자)
+    monkeypatch.setenv("GOOGLE_PLACES_API_KEY", "")
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()

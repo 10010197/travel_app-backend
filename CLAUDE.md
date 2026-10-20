@@ -14,7 +14,7 @@
 | B1 | ✅ | 프로젝트, `core/`(설정·오류·인증·호출 제한·로그), `db/`, 마이그레이션 + RLS, 마스터 데이터 시드, DB 테스트 |
 | B2 | 🟡 | 서버가 쓰는 규칙만 옮김(`days`, `time_band`, `duplicate`, `geo`). `rule-fixtures` 복사는 아직 |
 | B3 | ✅ | identity·catalog·trips 모듈 (API_SPEC #4~#29) |
-| B4 | 🟡 | places 모듈 (#30~#36). 식당 제공자는 샘플 16곳(`integrations/places/sample.py`). Google Places 구현은 아직 |
+| B4 | ✅ | places 모듈 (#30~#36). 식당 제공자는 `GOOGLE_PLACES_API_KEY`가 있으면 Google Places(New)(`integrations/places/google.py`, 필드 마스크·사진은 키 없는 photoUri), 없으면 샘플 16곳(`sample.py`) |
 | B5 | 🟡 | 메뉴 분류·식이 정규화는 사전 구현(`integrations/ai/dictionary.py`, 목과 같은 규칙). LangChain은 아직 |
 | B6 | ✅ | sharing 모듈 (#37~#41) |
 | B7 | — | 계약을 OpenAPI로 이전, 배포 |
@@ -47,7 +47,7 @@ app/
   modules/<경계>/    identity, catalog, trips, places, sharing
                      router.py → service.py → repository.py, schemas.py
   domain/            프론트 src/domain과 이름을 맞춘 순수 함수 (서버가 쓰는 것만)
-  integrations/      ai/(ports.py + dictionary.py), places/(ports.py + models.py + sample.py)
+  integrations/      ai/(ports.py + dictionary.py), places/(ports.py + models.py + google.py + sample.py)
   seed/master_data.py
 DB/
   init.sql           스키마 전체 = supabase/migrations 합본. 자동 생성, 직접 고치지 않는다
@@ -110,7 +110,7 @@ tests/
 - DB 서버: `DATABASE_URL_TEST`가 있으면 그것, 없으면 `pgserver`(개발 의존성)가 임시 PostgreSQL을 띄운다. Docker 없이 돈다.
 - 실패를 기대하는 RLS 테스트는 `with pytest.raises(...), as_user(...):` 순서로 쓴다.
 - `tests/db/test_api_flow.py`는 같은 DB에 앱을 붙여(`DATABASE_URL`) 라우터 → 서비스 → RLS까지 부른다. 사용자는 autocommit 연결로 `auth.users`에 넣고 테스트 토큰(HS256)을 쓴다.
-- 외부 API(LLM, Places)는 테스트에서 실제로 부르지 않는다. `integrations/ai/dictionary.py`, `integrations/places/sample.py`를 쓴다.
+- 외부 API(LLM, Places)는 테스트에서 실제로 부르지 않는다. `integrations/ai/dictionary.py`, `integrations/places/sample.py`를 쓴다. Google 제공자는 `httpx.MockTransport`로 응답 변환만 확인한다(`tests/integrations`). `tests/conftest.py`가 `GOOGLE_PLACES_API_KEY`를 비워 `.env`의 실제 키를 쓰지 않는다.
 - 목 핸들러 테스트(`frontend/src/mocks/__tests__/handlers.test.ts`)의 시나리오를 모듈 테스트의 체크리스트로 쓴다.
 
 ### 로그
