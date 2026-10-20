@@ -1,8 +1,16 @@
-"""마스터 데이터 시드: JSON → 행 변환과 seed.sql 최신 상태 확인."""
+"""마스터 데이터 시드: JSON → 행 변환과 DB/data.sql·DB/init.sql 최신 상태 확인."""
 
 import json
 
-from app.seed.master_data import MASTER_DIR, SEED_SQL_PATH, build_catalog_rows, render_seed_sql
+from app.seed.master_data import (
+    INIT_SQL_PATH,
+    MASTER_DIR,
+    MIGRATIONS_DIR,
+    SEED_SQL_PATH,
+    build_catalog_rows,
+    render_init_sql,
+    render_seed_sql,
+)
 
 
 def test_rows_match_master_data_json() -> None:
@@ -29,7 +37,7 @@ def test_parent_food_tags_come_before_children() -> None:
 
 
 def test_committed_seed_sql_is_up_to_date() -> None:
-    """data/master-data를 바꾸고 seed.sql을 다시 만들지 않으면 실패한다.
+    """data/master-data를 바꾸고 DB/data.sql을 다시 만들지 않으면 실패한다.
 
     고치려면: `uv run python -m app.seed.master_data --sql`
     """
@@ -41,3 +49,14 @@ def test_seed_sql_escapes_quotes() -> None:
     rows = build_catalog_rows()
     rows["cities"][0]["name"] = "O'Kuoka"
     assert "'O''Kuoka'" in render_seed_sql(rows)
+
+
+def test_committed_init_sql_matches_migrations() -> None:
+    """마이그레이션을 더하거나 고치고 DB/init.sql을 다시 만들지 않으면 실패한다.
+
+    고치려면: `uv run python -m app.seed.master_data --sql`
+    """
+    init_sql = INIT_SQL_PATH.read_text(encoding="utf-8")
+    assert init_sql == render_init_sql()
+    for migration in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        assert f"-- ===== {migration.name} =====" in init_sql

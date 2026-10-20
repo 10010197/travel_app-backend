@@ -17,8 +17,9 @@ import psycopg
 import pytest
 from psycopg import sql
 
-BACKEND = Path(__file__).resolve().parents[2]
-MIGRATIONS = sorted((BACKEND / "supabase" / "migrations").glob("*.sql"))
+from app.seed.master_data import MIGRATIONS_DIR, SEED_SQL_PATH
+
+MIGRATIONS = sorted(MIGRATIONS_DIR.glob("*.sql"))
 HERE = Path(__file__).resolve().parent
 
 
@@ -46,7 +47,7 @@ def database_url(server_url: str) -> Iterator[str]:
         conn.execute((HERE / "supabase_stub.sql").read_text(encoding="utf-8"))
         for migration in MIGRATIONS:
             conn.execute(migration.read_text(encoding="utf-8"))
-        conn.execute((BACKEND / "supabase" / "seed.sql").read_text(encoding="utf-8"))
+        conn.execute(SEED_SQL_PATH.read_text(encoding="utf-8"))
         conn.execute((HERE / "supabase_grants.sql").read_text(encoding="utf-8"))
     yield url
     with psycopg.connect(server_url, autocommit=True) as admin:

@@ -6,10 +6,13 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi==0.146.0",
     "httpx==0.28.1",
+    "psycopg-pool==3.3.3",
+    "psycopg[binary,pool]==3.3.6",
     "pydantic==2.14.1",
     "pydantic-settings==2.16.0",
     "pyjwt[crypto]==2.15.1",
     "supabase==2.33.0",
+    "tzdata==2026.5",
     "uvicorn[standard]==0.54.0",
 ]
 
@@ -17,7 +20,6 @@ dependencies = [
 dev = [
     "mypy==2.4.0",
     "pgserver==0.1.4",
-    "psycopg[binary]==3.3.6",
     "pytest==9.1.1",
     "ruff==0.17.1",
 ]

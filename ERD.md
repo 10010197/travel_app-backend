@@ -2,7 +2,8 @@
 
 - DB: Supabase PostgreSQL 15 이상 + Supabase Auth (`auth.users`)
 - 원본: `supabase/migrations/0001~0007`. 이 문서와 마이그레이션이 다르면 마이그레이션이 맞다
-- 검증: `tests/db` (제약·RLS·외래 키 인덱스를 자동 확인)
+- 한 파일로 보기: `DB/init.sql`(스키마 전체 = 마이그레이션 합본), `DB/data.sql`(초기 데이터 = 마스터 데이터). 둘 다 `uv run python -m app.seed.master_data --sql`이 만든다
+- 검증: `tests/db` (제약·RLS·외래 키 인덱스, API 흐름을 자동 확인)
 - 규칙 근거: 프론트 레포 `docs/BUSINESS_LOGIC.md`, `docs/API_SPEC.md`, `docs/DATABASE.md`
 
 이 문서는 **어떤 표에 무엇을 저장하고, 데이터를 적게·한 번만 저장하려고 무엇을 저장하지 않는지**를 한눈에 보여준다.

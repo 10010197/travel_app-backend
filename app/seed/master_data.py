@@ -4,7 +4,10 @@
 이 모듈은 JSON을 catalog 테이블 행으로 바꾸고, 두 가지 방법으로 넣는다.
 
 - `uv run python -m app.seed.master_data`        Supabase에 upsert (service_role 키 필요)
-- `uv run python -m app.seed.master_data --sql`  supabase/seed.sql을 다시 만든다 (`supabase db reset` 때 실행됨)
+- `uv run python -m app.seed.master_data --sql`  DB/init.sql(스키마)과 DB/data.sql(초기 데이터)을 다시 만든다
+
+Supabase는 `supabase start`·`db reset` 때 supabase/migrations를 적용하고 DB/data.sql을 시드로 넣는다(config.toml).
+DB/init.sql은 그 마이그레이션들을 번호 순서로 이은 합본이다(빈 Supabase DB에 한 번에 적용하거나 스키마를 한눈에 볼 때).
 
 upsert라 여러 번 실행해도 된다. JSON에서 지운 행은 지우지 않는다(이미 여행이 참조할 수 있어서). 지울 때는 마이그레이션으로 한다.
 """
@@ -17,7 +20,10 @@ from typing import Any
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
 MASTER_DIR = BACKEND_ROOT / "data" / "master-data"
-SEED_SQL_PATH = BACKEND_ROOT / "supabase" / "seed.sql"
+MIGRATIONS_DIR = BACKEND_ROOT / "supabase" / "migrations"
+DB_DIR = BACKEND_ROOT / "DB"
+INIT_SQL_PATH = DB_DIR / "init.sql"
+SEED_SQL_PATH = DB_DIR / "data.sql"
 
 Row = dict[str, Any]
 
@@ -151,12 +157,30 @@ def _upsert_sql(table: str, key: str, rows: Iterable[Row]) -> str:
 
 
 def render_seed_sql(rows: dict[str, list[Row]]) -> str:
-    """supabase/seed.sql 내용. 직접 고치지 말고 이 함수로 다시 만든다."""
+    """DB/data.sql 내용: 앱이 돌려면 꼭 있어야 하는 초기 데이터(마스터 데이터). 직접 고치지 말고 이 함수로 다시 만든다."""
     header = (
-        "-- 자동 생성 파일: backend/app/seed/master_data.py --sql\n"
-        "-- 원본은 backend/data/master-data/*.json. 이 파일을 직접 고치지 않는다.\n\n"
+        "-- 자동 생성 파일: app/seed/master_data.py --sql\n"
+        "-- 초기 데이터(마스터 데이터). 원본은 data/master-data/*.json. 이 파일을 직접 고치지 않는다.\n"
+        "-- DB/init.sql 다음에 적용한다. upsert라 여러 번 적용해도 된다.\n\n"
     )
     return header + "\n".join(_upsert_sql(t, key, rows[t]) for t, key in TABLE_ORDER)
+
+
+def render_init_sql(migrations_dir: Path = MIGRATIONS_DIR) -> str:
+    """DB/init.sql 내용: supabase/migrations를 번호 순서로 이은 스키마 전체.
+
+    스키마의 원본은 마이그레이션 파일이다(바꿀 때는 새 번호를 더한다). 이 파일은 합본이라 직접 고치지 않는다.
+    """
+    header = (
+        "-- 자동 생성 파일: app/seed/master_data.py --sql\n"
+        "-- 스키마 전체 (테이블·제약·RLS·인덱스·뷰). 원본은 supabase/migrations/*.sql. 직접 고치지 않는다.\n"
+        "-- auth 스키마와 anon·authenticated·service_role 역할이 있는 빈 Supabase DB에 적용한다.\n"
+    )
+    parts = [
+        f"\n-- ===== {path.name} =====\n\n{path.read_text(encoding='utf-8').strip()}\n"
+        for path in sorted(migrations_dir.glob("*.sql"))
+    ]
+    return header + "".join(parts)
 
 
 def upsert_to_supabase(rows: dict[str, list[Row]]) -> None:
@@ -173,13 +197,17 @@ def upsert_to_supabase(rows: dict[str, list[Row]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="data/master-data → catalog 테이블")
-    parser.add_argument("--sql", action="store_true", help="supabase/seed.sql을 다시 만든다")
+    parser.add_argument(
+        "--sql", action="store_true", help="DB/init.sql과 DB/data.sql을 다시 만든다"
+    )
     args = parser.parse_args()
 
     rows = build_catalog_rows()
     if args.sql:
+        DB_DIR.mkdir(exist_ok=True)
+        INIT_SQL_PATH.write_text(render_init_sql(), encoding="utf-8")
         SEED_SQL_PATH.write_text(render_seed_sql(rows), encoding="utf-8")
-        print(f"{SEED_SQL_PATH} 를 다시 만들었어요")
+        print(f"{INIT_SQL_PATH}, {SEED_SQL_PATH} 를 다시 만들었어요")
     else:
         upsert_to_supabase(rows)
         print(

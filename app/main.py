@@ -5,15 +5,30 @@
 그래서 모든 라우터를 /api 아래에 붙인다. 계약 경로는 frontend/src/api/endpoints.ts와 같다.
 """
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
+from app.db.session import close_pool
+from app.modules.catalog.router import router as catalog_router
+from app.modules.identity.router import router as identity_router
+from app.modules.places.router import router as places_router
+from app.modules.sharing.router import router as sharing_router
+from app.modules.trips.router import router as trips_router
 from app.routers import health
 
 API_PREFIX = "/api"
+
+
+@asynccontextmanager
+async def _lifespan(_: FastAPI) -> AsyncIterator[None]:
+    yield
+    close_pool()
 
 
 def create_app() -> FastAPI:
@@ -28,6 +43,7 @@ def create_app() -> FastAPI:
         version="0.1.0",
         docs_url=f"{API_PREFIX}/docs",
         openapi_url=f"{API_PREFIX}/openapi.json",
+        lifespan=_lifespan,
     )
     install_error_handlers(app)
     if settings.cors_origins:
@@ -40,7 +56,11 @@ def create_app() -> FastAPI:
 
     api = APIRouter(prefix=API_PREFIX)
     api.include_router(health.router)
-    # B3~B6: identity, catalog, trips, places, sharing 라우터를 여기에 붙인다
+    api.include_router(identity_router)
+    api.include_router(catalog_router)
+    api.include_router(trips_router)
+    api.include_router(places_router)
+    api.include_router(sharing_router)
     app.include_router(api)
     return app
 

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     # 토큰 검증 방식: 레거시 HS256 공유 비밀이 있으면 그것을, 없으면 프로젝트 JWKS(비대칭 서명 키)를 쓴다.
     supabase_jwt_secret: SecretStr = SecretStr("")
     jwt_audience: str = "authenticated"
+    # API가 쓰는 Postgres 직접 연결 (app/db/session.py). 요청마다 역할·클레임을 바꿔 RLS를 그대로 적용한다.
+    # 로컬: postgresql://postgres:postgres@127.0.0.1:54322/postgres, 원격: Supabase의 Session pooler 주소
+    database_url: SecretStr = SecretStr("")
+    db_pool_max_size: int = 10
 
     # 브라우저 출처. 개발은 Vite proxy로 같은 출처라 비워도 되지만, 배포(Vercel → Render)에는 필요하다.
     cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)

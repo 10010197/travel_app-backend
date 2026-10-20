@@ -27,6 +27,8 @@ class CurrentUser:
     id: str
     is_anonymous: bool
     access_token: str
+    # 토큰의 email 클레임 (GET /me). 게스트는 없다
+    email: str | None = None
 
 
 def _unauthorized(message: str = "로그인이 필요해요.") -> AppError:
@@ -76,6 +78,7 @@ def _user_from(credentials: HTTPAuthorizationCredentials, settings: Settings) ->
         id=str(claims["sub"]),
         is_anonymous=bool(claims.get("is_anonymous", False)),
         access_token=credentials.credentials,
+        email=claims.get("email") or None,
     )
 
 

@@ -1,5 +1,6 @@
--- 자동 생성 파일: backend/app/seed/master_data.py --sql
--- 원본은 backend/data/master-data/*.json. 이 파일을 직접 고치지 않는다.
+-- 자동 생성 파일: app/seed/master_data.py --sql
+-- 초기 데이터(마스터 데이터). 원본은 data/master-data/*.json. 이 파일을 직접 고치지 않는다.
+-- DB/init.sql 다음에 적용한다. upsert라 여러 번 적용해도 된다.
 
 insert into public.menu_kinds (id, label, allow_daily_repeat, sort_order) values
   ('noodle', '면', false, 0),
