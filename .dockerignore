@@ -1,0 +1,11 @@
+# 비밀값과 로컬 산출물은 이미지에 넣지 않는다
+.env
+.env.*
+!.env.example
+.venv
+**/__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+tests
+supabase/.temp
