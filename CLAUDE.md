@@ -137,3 +137,22 @@ npx -y supabase@2.121.0 stop           # 멈추기 (데이터는 남는다)
 - `config.toml`의 인증: 익명 로그인 켬(게스트), `enable_manual_linking = true`(게스트 → 소셜 계정 연결), Google·카카오는 `enabled = false` 자리만 있다. OAuth 앱을 등록하면 `.env`에 `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`·`…_SECRET`(카카오도 같은 꼴)을 넣고 켠다.
 - 개발용 데모 계정: `uv run python -m app.seed.demo_user`. 비밀번호는 `.env`의 `DEMO_USER_PASSWORD`(없으면 만들어 적는다). 프론트 개발 서버의 "데모 계정으로 로그인"이 쓴다.
 - 프론트 연결: 이 서버(8000)를 켜고 `frontend`에서 `pnpm dev`. 프론트 `.env.development.local`에 Supabase URL·anon key·데모 비밀번호를 넣는다(프론트 `.env.example`).
+
+## 배포 (Render)
+
+`travel_app-backend` 레포를 Render Web Service로 연결한다. 런타임은 Docker(레포 맨 위의 `Dockerfile`). 서버는 Render가 주는 `PORT`에 뜬다.
+
+- Health Check Path: `/api/health`
+- 환경 변수:
+
+| 이름 | 값 |
+|---|---|
+| `ENVIRONMENT` | `production` |
+| `DATABASE_URL` | Supabase의 **Session pooler** 주소(`…pooler.supabase.com:5432`). Direct connection은 IPv6라 Render에서 붙지 않는다 |
+| `SUPABASE_URL` | `https://<프로젝트>.supabase.co` (토큰 발급자 확인·JWKS) |
+| `SUPABASE_JWT_SECRET` | 비운다. 새 프로젝트는 비대칭 서명 키라 JWKS로 검증한다(레거시 HS256 프로젝트만 넣는다) |
+| `CORS_ORIGINS` | Vercel 도메인 (쉼표로 여러 개) |
+| `GOOGLE_PLACES_API_KEY` | 서버용 Places 키 |
+
+- 원격 DB 스키마는 배포와 따로 넣는다: `supabase link` → `supabase db push`(migrations), 그다음 `DB/data.sql`(SQL Editor 또는 psql).
+- 무료 인스턴스는 15분 동안 요청이 없으면 잠들고, 다음 첫 요청이 수십 초 걸린다.
