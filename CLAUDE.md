@@ -14,7 +14,7 @@
 | B1 | ✅ | 프로젝트, `core/`(설정·오류·인증·호출 제한·로그), `db/`, 마이그레이션 + RLS, 마스터 데이터 시드, DB 테스트 |
 | B2 | 🟡 | 서버가 쓰는 규칙만 옮김(`days`, `time_band`, `duplicate`, `geo`). `rule-fixtures` 복사는 아직 |
 | B3 | ✅ | identity·catalog·trips 모듈 (API_SPEC #4~#29) |
-| B4 | ✅ | places 모듈 (#30~#36). 식당 제공자는 `GOOGLE_PLACES_API_KEY`가 있으면 Google Places(New)(`integrations/places/google.py`, 필드 마스크·사진은 키 없는 photoUri), 없으면 샘플 16곳(`sample.py`) |
+| B4 | ✅ | places 모듈 (#30~#36, 다른 지역 검색 포함). 월 비용 추정(B-8)은 아직. 식당 제공자는 `GOOGLE_PLACES_API_KEY`가 있으면 Google Places(New)(`integrations/places/google.py`, 필드 마스크·사진은 키 없는 photoUri), 없으면 샘플 16곳(`sample.py`) |
 | B5 | 🟡 | 메뉴 분류·식이 정규화는 사전 구현(`integrations/ai/dictionary.py`, 목과 같은 규칙). LangChain은 아직 |
 | B6 | ✅ | sharing 모듈 (#37~#41) |
 | B7 | — | 계약을 OpenAPI로 이전, 배포 |
