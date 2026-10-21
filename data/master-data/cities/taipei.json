@@ -1,0 +1,93 @@
+{
+  "$comment": "타이베이 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
+  "status": "draft",
+  "id": "taipei",
+  "sortOrder": 3,
+  "name": "타이베이",
+  "countryCode": "TW",
+  "timeZone": "Asia/Taipei",
+  "center": { "lat": 25.0478, "lng": 121.517 },
+  "areas": [
+    { "id": "ximending", "name": "시먼딩", "center": { "lat": 25.0421, "lng": 121.5081 }, "radiusMeters": 600 },
+    { "id": "zhongshan", "name": "중산", "center": { "lat": 25.0527, "lng": 121.5203 }, "radiusMeters": 600 },
+    { "id": "yongkang", "name": "융캉제", "center": { "lat": 25.033, "lng": 121.5297 }, "radiusMeters": 500 },
+    { "id": "xinyi", "name": "신이", "center": { "lat": 25.034, "lng": 121.5645 }, "radiusMeters": 900 },
+    { "id": "dadaocheng", "name": "다다오청", "center": { "lat": 25.0559, "lng": 121.5101 }, "radiusMeters": 500 },
+    { "id": "shilin", "name": "스린 야시장", "center": { "lat": 25.088, "lng": 121.5241 }, "radiusMeters": 600 },
+    { "id": "raohe", "name": "라오허제 야시장", "center": { "lat": 25.0509, "lng": 121.5775 }, "radiusMeters": 500 }
+  ],
+  "mustMenus": [
+    {
+      "id": "tpe-beef-noodle",
+      "name": "우육면",
+      "kindId": "noodle",
+      "description": "진한 소고기 국물의 굵은 면",
+      "foodTags": ["meat", "beef", "wheat"],
+      "isSignature": true
+    },
+    {
+      "id": "tpe-xiaolongbao",
+      "name": "샤오롱바오",
+      "kindId": "other",
+      "description": "육즙 가득한 작은 찐만두",
+      "foodTags": ["meat", "pork", "wheat"],
+      "isSignature": true
+    },
+    {
+      "id": "tpe-luroufan",
+      "name": "루로우판",
+      "kindId": "rice",
+      "description": "간장에 졸인 다진 돼지고기 덮밥",
+      "foodTags": ["meat", "pork", "egg"],
+      "isSignature": true
+    },
+    {
+      "id": "tpe-mango-ice",
+      "name": "망고 빙수",
+      "kindId": "dessert",
+      "description": "생망고를 듬뿍 올린 빙수",
+      "foodTags": ["dairy"],
+      "isSignature": true
+    },
+    {
+      "id": "tpe-jipai",
+      "name": "지파이",
+      "kindId": "fried",
+      "description": "얼굴만 한 닭가슴살 튀김, 야시장 간식",
+      "foodTags": ["meat", "chicken", "wheat"],
+      "isSignature": false
+    },
+    {
+      "id": "tpe-oyster-omelette",
+      "name": "어아젠",
+      "kindId": "street",
+      "description": "굴을 넣은 전분 부침",
+      "foodTags": ["seafood", "shellfish", "egg"],
+      "isSignature": false
+    },
+    {
+      "id": "tpe-hujiaobing",
+      "name": "후자오빙",
+      "kindId": "street",
+      "description": "화덕에 붙여 구운 후추 고기빵",
+      "foodTags": ["meat", "pork", "wheat", "sesame"],
+      "isSignature": false
+    },
+    {
+      "id": "tpe-hotpot",
+      "name": "훠궈",
+      "kindId": "hotpot",
+      "description": "마라·맑은 국물을 고르는 중국식 샤브샤브",
+      "foodTags": ["meat"],
+      "isSignature": false
+    },
+    {
+      "id": "tpe-bubble-tea",
+      "name": "버블티",
+      "kindId": "cafe",
+      "description": "타피오카 펄을 넣은 밀크티",
+      "foodTags": ["dairy"],
+      "isSignature": false
+    }
+  ]
+}

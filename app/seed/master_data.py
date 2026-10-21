@@ -83,8 +83,10 @@ def build_catalog_rows(master_dir: Path = MASTER_DIR) -> dict[str, list[Row]]:
         "must_menus": [],
     }
 
-    for city_index, path in enumerate(sorted((master_dir / "cities").glob("*.json"))):
-        city = _read(path)
+    # 도시 순서(= 도시 목록 API 순서)는 JSON의 sortOrder. 없으면 파일 이름 순서 뒤에 둔다
+    cities = [_read(path) for path in sorted((master_dir / "cities").glob("*.json"))]
+    cities.sort(key=lambda c: c.get("sortOrder", len(cities)))
+    for city_index, city in enumerate(cities):
         rows["cities"].append(
             {
                 "id": city["id"],

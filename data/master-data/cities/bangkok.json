@@ -1,0 +1,93 @@
+{
+  "$comment": "방콕 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
+  "status": "draft",
+  "id": "bangkok",
+  "sortOrder": 4,
+  "name": "방콕",
+  "countryCode": "TH",
+  "timeZone": "Asia/Bangkok",
+  "center": { "lat": 13.7563, "lng": 100.5018 },
+  "areas": [
+    { "id": "siam", "name": "시암", "center": { "lat": 13.7457, "lng": 100.5343 }, "radiusMeters": 700 },
+    { "id": "sukhumvit", "name": "수쿰윗", "center": { "lat": 13.7376, "lng": 100.5603 }, "radiusMeters": 900 },
+    { "id": "silom", "name": "실롬", "center": { "lat": 13.7286, "lng": 100.534 }, "radiusMeters": 800 },
+    { "id": "khaosan", "name": "카오산 로드", "center": { "lat": 13.759, "lng": 100.4974 }, "radiusMeters": 500 },
+    { "id": "yaowarat", "name": "차이나타운", "center": { "lat": 13.7408, "lng": 100.5103 }, "radiusMeters": 600 },
+    { "id": "riverside", "name": "리버사이드", "center": { "lat": 13.7266, "lng": 100.5102 }, "radiusMeters": 700 },
+    { "id": "chatuchak", "name": "짜뚜짝", "center": { "lat": 13.7999, "lng": 100.5505 }, "radiusMeters": 800 }
+  ],
+  "mustMenus": [
+    {
+      "id": "bkk-pad-thai",
+      "name": "팟타이",
+      "kindId": "noodle",
+      "description": "새우와 땅콩을 올린 볶음 쌀국수",
+      "foodTags": ["seafood", "crustacean", "egg", "nuts"],
+      "isSignature": true
+    },
+    {
+      "id": "bkk-tom-yum",
+      "name": "똠얌꿍",
+      "kindId": "seafood",
+      "description": "새우를 넣은 맵고 신 수프",
+      "foodTags": ["seafood", "crustacean"],
+      "isSignature": true
+    },
+    {
+      "id": "bkk-khao-man-gai",
+      "name": "카오만가이",
+      "kindId": "rice",
+      "description": "닭 육수로 지은 밥과 삶은 닭",
+      "foodTags": ["meat", "chicken"],
+      "isSignature": true
+    },
+    {
+      "id": "bkk-mango-sticky-rice",
+      "name": "망고 스티키라이스",
+      "kindId": "dessert",
+      "description": "코코넛 찹쌀밥에 생망고",
+      "foodTags": [],
+      "isSignature": true
+    },
+    {
+      "id": "bkk-pad-kra-pao",
+      "name": "팟카파오",
+      "kindId": "rice",
+      "description": "바질 고기볶음 덮밥과 달걀 프라이",
+      "foodTags": ["meat", "pork", "egg"],
+      "isSignature": false
+    },
+    {
+      "id": "bkk-som-tam",
+      "name": "쏨땀",
+      "kindId": "other",
+      "description": "그린 파파야 샐러드",
+      "foodTags": ["seafood", "crustacean", "nuts"],
+      "isSignature": false
+    },
+    {
+      "id": "bkk-moo-kata",
+      "name": "무까타",
+      "kindId": "grill",
+      "description": "불판 가운데 굽고 둘레에 끓이는 태국식 고기구이",
+      "foodTags": ["meat", "pork"],
+      "isSignature": false
+    },
+    {
+      "id": "bkk-boat-noodle",
+      "name": "꾸어이띠아우 르아",
+      "kindId": "noodle",
+      "description": "작은 그릇에 담은 진한 보트 누들",
+      "foodTags": ["meat", "pork", "beef", "offal"],
+      "isSignature": false
+    },
+    {
+      "id": "bkk-poo-pad-pong-curry",
+      "name": "뿌팟퐁커리",
+      "kindId": "seafood",
+      "description": "달걀을 풀어 볶은 게 커리",
+      "foodTags": ["seafood", "crustacean", "egg", "dairy"],
+      "isSignature": false
+    }
+  ]
+}

@@ -49,12 +49,18 @@ def test_seed_loads_master_data(db: psycopg.Connection) -> None:
     with as_user(db, None):
         cities = db.execute("select id, time_zone from public.cities").fetchall()
         signature = db.execute(
-            "select count(*) from public.must_menus where is_signature"
+            "select count(*) from public.must_menus where city_id = 'fukuoka' and is_signature"
         ).fetchone()
         noodle = db.execute(
             "select allow_daily_repeat from public.menu_kinds where id = 'noodle'"
         ).fetchone()
-    assert ("fukuoka", "Asia/Tokyo") in cities
+    assert set(cities) == {
+        ("fukuoka", "Asia/Tokyo"),
+        ("osaka", "Asia/Tokyo"),
+        ("tokyo", "Asia/Tokyo"),
+        ("taipei", "Asia/Taipei"),
+        ("bangkok", "Asia/Bangkok"),
+    }
     assert signature == (4,)
     assert noodle == (False,)
 

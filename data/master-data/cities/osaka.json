@@ -1,0 +1,93 @@
+{
+  "$comment": "오사카 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
+  "status": "draft",
+  "id": "osaka",
+  "sortOrder": 1,
+  "name": "오사카",
+  "countryCode": "JP",
+  "timeZone": "Asia/Tokyo",
+  "center": { "lat": 34.6937, "lng": 135.5023 },
+  "areas": [
+    { "id": "umeda", "name": "우메다", "center": { "lat": 34.7025, "lng": 135.4959 }, "radiusMeters": 900 },
+    { "id": "namba", "name": "난바", "center": { "lat": 34.6659, "lng": 135.5013 }, "radiusMeters": 700 },
+    { "id": "shinsaibashi", "name": "신사이바시", "center": { "lat": 34.6749, "lng": 135.5009 }, "radiusMeters": 500 },
+    { "id": "shinsekai", "name": "신세카이", "center": { "lat": 34.6525, "lng": 135.5063 }, "radiusMeters": 500 },
+    { "id": "tenma", "name": "텐마", "center": { "lat": 34.7046, "lng": 135.5124 }, "radiusMeters": 600 },
+    { "id": "tsuruhashi", "name": "츠루하시", "center": { "lat": 34.6655, "lng": 135.5308 }, "radiusMeters": 500 },
+    { "id": "osakajo", "name": "오사카성", "center": { "lat": 34.6873, "lng": 135.5262 }, "radiusMeters": 800 }
+  ],
+  "mustMenus": [
+    {
+      "id": "osa-takoyaki",
+      "name": "타코야키",
+      "kindId": "street",
+      "description": "문어를 넣은 동그란 풀빵, 오사카 대표 간식",
+      "foodTags": ["seafood", "cephalopod", "wheat", "egg"],
+      "isSignature": true
+    },
+    {
+      "id": "osa-okonomiyaki",
+      "name": "오코노미야키",
+      "kindId": "grill",
+      "description": "철판에 구운 양배추 부침",
+      "foodTags": ["meat", "pork", "wheat", "egg"],
+      "isSignature": true
+    },
+    {
+      "id": "osa-kushikatsu",
+      "name": "쿠시카츠",
+      "kindId": "fried",
+      "description": "꼬치 튀김, 신세카이 명물",
+      "foodTags": ["meat", "pork", "beef", "wheat", "egg"],
+      "isSignature": true
+    },
+    {
+      "id": "osa-kitsune-udon",
+      "name": "키츠네 우동",
+      "kindId": "noodle",
+      "description": "달큰한 유부를 올린 맑은 국물 우동",
+      "foodTags": ["wheat"],
+      "isSignature": true
+    },
+    {
+      "id": "osa-yakiniku",
+      "name": "야키니쿠",
+      "kindId": "grill",
+      "description": "츠루하시 숯불 고기구이",
+      "foodTags": ["meat", "beef", "offal"],
+      "isSignature": false
+    },
+    {
+      "id": "osa-battera",
+      "name": "밧테라",
+      "kindId": "seafood",
+      "description": "초절임 고등어를 눌러 만든 상자 초밥",
+      "foodTags": ["seafood", "fish"],
+      "isSignature": false
+    },
+    {
+      "id": "osa-butaman",
+      "name": "부타만",
+      "kindId": "other",
+      "description": "돼지고기 찐빵",
+      "foodTags": ["meat", "pork", "wheat"],
+      "isSignature": false
+    },
+    {
+      "id": "osa-omurice",
+      "name": "오므라이스",
+      "kindId": "rice",
+      "description": "오사카에서 시작된 달걀 덮은 볶음밥",
+      "foodTags": ["egg", "meat", "chicken"],
+      "isSignature": false
+    },
+    {
+      "id": "osa-ikayaki",
+      "name": "이카야키",
+      "kindId": "street",
+      "description": "오징어를 넣어 납작하게 구운 부침",
+      "foodTags": ["seafood", "cephalopod", "wheat", "egg"],
+      "isSignature": false
+    }
+  ]
+}

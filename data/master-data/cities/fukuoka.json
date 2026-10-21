@@ -2,6 +2,7 @@
   "$comment": "시연 도시 후쿠오카 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
   "status": "draft",
   "id": "fukuoka",
+  "sortOrder": 0,
   "name": "후쿠오카",
   "countryCode": "JP",
   "timeZone": "Asia/Tokyo",

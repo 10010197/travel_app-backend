@@ -15,16 +15,33 @@ from app.seed.master_data import (
 
 def test_rows_match_master_data_json() -> None:
     rows = build_catalog_rows()
-    fukuoka = json.loads((MASTER_DIR / "cities" / "fukuoka.json").read_text(encoding="utf-8"))
+    cities = [
+        json.loads(path.read_text(encoding="utf-8"))
+        for path in sorted((MASTER_DIR / "cities").glob("*.json"))
+    ]
     kinds = json.loads((MASTER_DIR / "menu-kinds.json").read_text(encoding="utf-8"))["kinds"]
 
-    assert [c["id"] for c in rows["cities"]] == ["fukuoka"]
-    assert len(rows["areas"]) == len(fukuoka["areas"])
-    assert len(rows["must_menus"]) == len(fukuoka["mustMenus"])
+    assert [c["id"] for c in rows["cities"]] == ["fukuoka", "osaka", "tokyo", "taipei", "bangkok"]
+    assert len(rows["areas"]) == sum(len(c["areas"]) for c in cities)
+    assert len(rows["must_menus"]) == sum(len(c["mustMenus"]) for c in cities)
     assert len(rows["menu_kinds"]) == len(kinds)
     assert {m["id"] for m in rows["must_menus"] if m["is_signature"]} == {
-        m["id"] for m in fukuoka["mustMenus"] if m.get("isSignature")
+        m["id"] for c in cities for m in c["mustMenus"] if m.get("isSignature")
     }
+
+
+def test_city_references_are_consistent() -> None:
+    """동네 id는 도시를 넘어 유일하고(areas 기본 키), 메뉴 종류와 음식 태그는 목록에 있는 것만 쓴다."""
+    rows = build_catalog_rows()
+    area_ids = [a["id"] for a in rows["areas"]]
+    assert len(area_ids) == len(set(area_ids))
+    menu_ids = [m["id"] for m in rows["must_menus"]]
+    assert len(menu_ids) == len(set(menu_ids))
+    kind_ids = {k["id"] for k in rows["menu_kinds"]}
+    tag_ids = {t["id"] for t in rows["food_tags"]}
+    for menu in rows["must_menus"]:
+        assert menu["kind_id"] in kind_ids, menu["id"]
+        assert set(menu["food_tags"]) <= tag_ids, menu["id"]
 
 
 def test_parent_food_tags_come_before_children() -> None:

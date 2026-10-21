@@ -104,6 +104,8 @@ tests/
 
 - 원본은 `data/master-data/*.json` 하나다. 프론트 레포의 `src/mocks/data/master-data`는 복사본이라, 바꾸면 그쪽에도 복사한다. 바꾸면 `--sql`로 `DB/data.sql`을 다시 만든다(`tests/seed`가 확인한다). 마이그레이션을 더해도 `--sql`로 `DB/init.sql`을 다시 만든다.
 - 동네 id는 도시를 넘어 유일해야 한다(`areas.id`가 기본 키).
+- 도시 순서(도시 목록 API 순서)는 도시 JSON의 `sortOrder`다. 새 도시는 겹치지 않게 다음 번호를 준다.
+- 마스터 데이터는 서버가 메모리에 들고 있다(`catalog/service.py`의 `lru_cache`). DB에 다시 넣었으면 서버를 다시 시작한다.
 
 ### 테스트
 

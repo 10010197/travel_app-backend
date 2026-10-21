@@ -1,0 +1,93 @@
+{
+  "$comment": "도쿄 마스터 데이터 (PRD 8.1, FEATURE_SPEC F-03, F-07). 동네 중심 좌표와 반경은 지도로 잡은 초안이며 Places API로 보정한다(Q-03). isSignature=true인 메뉴는 꼭 먹을 것 목록에서 기본 체크된다.",
+  "status": "draft",
+  "id": "tokyo",
+  "sortOrder": 2,
+  "name": "도쿄",
+  "countryCode": "JP",
+  "timeZone": "Asia/Tokyo",
+  "center": { "lat": 35.6812, "lng": 139.7671 },
+  "areas": [
+    { "id": "shinjuku", "name": "신주쿠", "center": { "lat": 35.6909, "lng": 139.7003 }, "radiusMeters": 900 },
+    { "id": "shibuya", "name": "시부야", "center": { "lat": 35.658, "lng": 139.7016 }, "radiusMeters": 800 },
+    { "id": "ginza", "name": "긴자", "center": { "lat": 35.6717, "lng": 139.765 }, "radiusMeters": 700 },
+    { "id": "tsukiji", "name": "츠키지", "center": { "lat": 35.6655, "lng": 139.7707 }, "radiusMeters": 500 },
+    { "id": "tsukishima", "name": "츠키시마", "center": { "lat": 35.6634, "lng": 139.7826 }, "radiusMeters": 500 },
+    { "id": "asakusa", "name": "아사쿠사", "center": { "lat": 35.7148, "lng": 139.7967 }, "radiusMeters": 700 },
+    { "id": "ueno", "name": "우에노", "center": { "lat": 35.7138, "lng": 139.7773 }, "radiusMeters": 700 }
+  ],
+  "mustMenus": [
+    {
+      "id": "tyo-sushi",
+      "name": "스시",
+      "kindId": "seafood",
+      "description": "에도마에 초밥, 츠키지 장외시장 추천",
+      "foodTags": ["seafood", "fish", "raw_fish"],
+      "isSignature": true
+    },
+    {
+      "id": "tyo-tendon",
+      "name": "텐동",
+      "kindId": "fried",
+      "description": "새우·채소 튀김 덮밥",
+      "foodTags": ["seafood", "crustacean", "wheat", "egg"],
+      "isSignature": true
+    },
+    {
+      "id": "tyo-soba",
+      "name": "소바",
+      "kindId": "noodle",
+      "description": "메밀 면을 쯔유에 찍어 먹는 자루 소바",
+      "foodTags": ["wheat"],
+      "isSignature": true
+    },
+    {
+      "id": "tyo-monjayaki",
+      "name": "몬자야키",
+      "kindId": "other",
+      "description": "묽은 반죽을 철판에 눌러 먹는 츠키시마 명물",
+      "foodTags": ["seafood", "wheat"],
+      "isSignature": true
+    },
+    {
+      "id": "tyo-tsukemen",
+      "name": "츠케멘",
+      "kindId": "noodle",
+      "description": "진한 국물에 찍어 먹는 굵은 면",
+      "foodTags": ["meat", "pork", "seafood", "fish", "wheat"],
+      "isSignature": false
+    },
+    {
+      "id": "tyo-unaju",
+      "name": "우나주",
+      "kindId": "rice",
+      "description": "찬합에 담은 장어 덮밥",
+      "foodTags": ["seafood", "fish"],
+      "isSignature": false
+    },
+    {
+      "id": "tyo-yakitori",
+      "name": "야키토리",
+      "kindId": "grill",
+      "description": "숯불 닭꼬치, 저녁 추천",
+      "foodTags": ["meat", "chicken", "offal"],
+      "isSignature": false
+    },
+    {
+      "id": "tyo-tonkatsu",
+      "name": "돈카츠",
+      "kindId": "fried",
+      "description": "두툼한 돼지고기 튀김 정식",
+      "foodTags": ["meat", "pork", "wheat", "egg"],
+      "isSignature": false
+    },
+    {
+      "id": "tyo-ningyoyaki",
+      "name": "닌교야키",
+      "kindId": "dessert",
+      "description": "팥소를 넣은 인형 모양 카스텔라, 아사쿠사 명물",
+      "foodTags": ["wheat", "egg"],
+      "isSignature": false
+    }
+  ]
+}
